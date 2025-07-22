@@ -1,0 +1,214 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  direction: rtl;
+}
+
+body {
+  font-family: 'Cairo', sans-serif;
+  @apply text-gray-900 bg-white dark:bg-gray-900 dark:text-gray-100;
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-4 py-2.5 lg:px-6 lg:py-2.5 bg-gray-900 text-white rounded-xl font-semibold 
+    hover:bg-gray-800 transition-all duration-300 shadow-luxury hover:shadow-luxury-hover 
+    focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50
+    dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100 text-sm lg:text-base;
+  }
+  
+  .btn-secondary {
+    @apply px-4 py-2.5 lg:px-6 lg:py-2.5 bg-white dark:bg-gray-800 text-gray-900 dark:text-white 
+    border border-gray-300 dark:border-gray-600 rounded-xl font-semibold 
+    hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 shadow-luxury hover:shadow-luxury-hover 
+    focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 text-sm lg:text-base;
+  }
+  
+  .card {
+    @apply bg-white dark:bg-gray-800 rounded-2xl lg:rounded-3xl shadow-luxury hover:shadow-luxury-hover transition-all duration-300 p-4 lg:p-6
+    border border-gray-100 dark:border-gray-700;
+  }
+  
+  .card-luxury {
+    @apply bg-white dark:bg-gray-800 rounded-3xl shadow-elegant hover:shadow-luxury-hover transition-all duration-500 p-6 lg:p-8
+    border border-gray-100 dark:border-gray-700 backdrop-blur-luxury;
+  }
+  
+  .input-field {
+    @apply w-full px-3 py-2.5 lg:px-4 lg:py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl lg:rounded-2xl 
+    focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-300
+    dark:text-gray-100 dark:placeholder-gray-400 text-sm lg:text-base shadow-luxury-soft;
+  }
+
+  .glass-effect {
+    @apply backdrop-blur-luxury bg-white/80 dark:bg-gray-900/80 border border-gray-200/50 dark:border-gray-700/50;
+  }
+
+  /* Subject card hover effects with soft colors */
+  .subject-card-pink {
+    @apply hover:bg-soft-pink-50 hover:border-soft-pink-200 dark:hover:bg-soft-pink-100/10 dark:hover:border-soft-pink-300/30;
+  }
+  
+  .subject-card-blue {
+    @apply hover:bg-soft-blue-50 hover:border-soft-blue-200 dark:hover:bg-soft-blue-100/10 dark:hover:border-soft-blue-300/30;
+  }
+  
+  .subject-card-purple {
+    @apply hover:bg-soft-purple-50 hover:border-soft-purple-200 dark:hover:bg-soft-purple-100/10 dark:hover:border-soft-purple-300/30;
+  }
+  
+  .subject-card-green {
+    @apply hover:bg-soft-green-50 hover:border-soft-green-200 dark:hover:bg-soft-green-100/10 dark:hover:border-soft-green-300/30;
+  }
+  
+  .subject-card-orange {
+    @apply hover:bg-soft-orange-50 hover:border-soft-orange-200 dark:hover:bg-soft-orange-100/10 dark:hover:border-soft-orange-300/30;
+  }
+  
+  .subject-card-yellow {
+    @apply hover:bg-soft-yellow-50 hover:border-soft-yellow-200 dark:hover:bg-soft-yellow-100/10 dark:hover:border-soft-yellow-300/30;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100 dark:bg-gray-800;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 dark:bg-gray-600 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400 dark:bg-gray-500;
+}
+
+/* Smooth transitions for luxury feel */
+* {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Line clamp utility */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Mobile-specific optimizations */
+@media (max-width: 1024px) {
+  /* Improve touch targets */
+  button, a {
+    min-height: 44px;
+  }
+  
+  input, select, textarea {
+    min-height: 48px;
+  }
+  
+  /* Optimize text sizes for mobile */
+  .text-xs { font-size: 0.75rem; }
+  .text-sm { font-size: 0.875rem; }
+  .text-base { font-size: 1rem; }
+  .text-lg { font-size: 1.125rem; }
+  .text-xl { font-size: 1.25rem; }
+  .text-2xl { font-size: 1.5rem; }
+  .text-3xl { font-size: 1.875rem; }
+  
+  /* Mobile bottom navigation safe area */
+  .pb-mobile-safe {
+    padding-bottom: calc(5rem + env(safe-area-inset-bottom));
+  }
+}
+
+/* iOS Safari specific fixes */
+@supports (-webkit-touch-callout: none) {
+  /* Fix viewport height on iOS */
+  .min-h-screen {
+    min-height: -webkit-fill-available;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+  
+  /* Improve touch scrolling */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Android specific optimizations */
+@media screen and (max-width: 768px) {
+  /* Prevent zoom on input focus */
+  input, select, textarea {
+    font-size: 16px;
+  }
+  
+  /* Better touch feedback */
+  button {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  /* Sharper borders and shadows */
+  .border {
+    border-width: 0.5px;
+  }
+  
+  .shadow-sm {
+    box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.05);
+  }
+}
+
+/* Luxury animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* Elegant hover effects */
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Mobile bottom navigation styles */
+@media (max-width: 1024px) {
+  .mobile-bottom-nav {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+  
+  .dark .mobile-bottom-nav {
+    background: rgba(31, 41, 55, 0.95);
+  }
+  
+  /* Safe area for devices with home indicator */
+  .mobile-bottom-nav {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
