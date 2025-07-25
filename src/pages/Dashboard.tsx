@@ -34,6 +34,9 @@ const semesters = [
   { id: '2', name: 'الفصل الثاني' },
   { id: '3', name: 'الفصل الثالث' },
 ];
+function getDisplayName(user: any): string {
+  return user?.name || user?.username || "User";
+}
 
 // Subject icons mapping
 const getSubjectIcon = (subjectId: string, index: number) => {
