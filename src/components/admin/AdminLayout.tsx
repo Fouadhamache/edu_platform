@@ -1,99 +1,255 @@
-import React from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
-import { Shield, LogOut, Settings, Users, BookOpen, Home } from 'lucide-react';
+import React, { useState } from 'react';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Shield, 
+  LogOut, 
+  Settings, 
+  Users, 
+  BookOpen, 
+  Home,
+  Sun,
+  Moon,
+  User,
+  ChevronRight,
+  BarChart3
+} from 'lucide-react';
 import { useAdmin } from '../../contexts/AdminContext';
 import { useTheme } from '../../contexts/ThemeContext';
 
 const AdminLayout: React.FC = () => {
   const { adminUser, adminLogout } = useAdmin();
   const { isDark, toggleTheme } = useTheme();
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   
+  const sidebarItems = [
+    { id: 'dashboard', label: 'لوحة التحكم', icon: Home, path: '/admin/dashboard' },
+    { id: 'teachers', label: 'إدارة المعلمين', icon: Users, path: '/admin/teachers' },
+    { id: 'lessons', label: 'إدارة الدروس', icon: BookOpen, path: '/admin/create-lesson' },
+    { id: 'analytics', label: 'الإحصائيات', icon: BarChart3, path: '/admin/analytics' },
+  ];
+
   const handleLogout = () => {
     adminLogout();
     navigate('/admin/login');
+    setIsProfileOpen(false);
   };
-  
+
+  const isActivePath = (path: string) => {
+    return location.pathname === path;
+  };
+
+  const handleNavigation = (path: string) => {
+    navigate(path);
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Admin Header */}
-      <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <div className="flex items-center">
-                <Shield className="h-8 w-8 text-primary-600 dark:text-primary-400" />
-                <span className="mr-2 text-xl font-bold text-gray-900 dark:text-white">
-                  لوحة تحكم المدير
-                </span>
-              </div>
+    <div className="flex h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden">
+      {/* Desktop Sidebar */}
+      <div className="hidden lg:flex lg:flex-col lg:w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-luxury">
+        {/* Sidebar Header */}
+        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center">
+            <div className="w-12 h-12 bg-red-600 dark:bg-red-500 rounded-xl flex items-center justify-center mr-3">
+              <Shield className="w-6 h-6 text-white" />
             </div>
-            
-            <div className="flex items-center space-x-4 space-x-reverse">
-              <button
-                onClick={toggleTheme}
-                className="p-2 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+            <div>
+              <h1 className="text-xl font-bold text-gray-900 dark:text-white">لوحة الإدارة</h1>
+              <p className="text-sm text-gray-600 dark:text-gray-300">منصة قلم</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Admin Profile Section */}
+        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center mb-4">
+            <div className="w-12 h-12 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center mr-3">
+              <User className="w-6 h-6 text-gray-600 dark:text-gray-300" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                {adminUser?.name}
+              </h3>
+              <p className="text-sm text-gray-600 dark:text-gray-300">مدير المنصة</p>
+            </div>
+            <button
+              onClick={() => setIsProfileOpen(!isProfileOpen)}
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            >
+              <ChevronRight className={`w-4 h-4 text-gray-500 transition-transform ${isProfileOpen ? 'rotate-90' : ''}`} />
+            </button>
+          </div>
+          
+          {/* Profile Dropdown */}
+          <AnimatePresence>
+            {isProfileOpen && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="space-y-2"
               >
-                {isDark ? '☀️' : '🌙'}
+                <button
+                  onClick={() => navigate('/')}
+                  className="w-full flex items-center p-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors text-sm"
+                >
+                  <Settings className="w-4 h-4 ml-3" />
+                  عرض المنصة
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Navigation Items */}
+        <nav className="flex-1 p-6">
+          <div className="space-y-2">
+            {sidebarItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => handleNavigation(item.path)}
+                className={`w-full flex items-center p-4 rounded-xl transition-all ${
+                  isActivePath(item.path)
+                    ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-luxury'
+                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+              >
+                <item.icon className="w-5 h-5 ml-3" />
+                <span className="text-base font-medium">{item.label}</span>
               </button>
+            ))}
+          </div>
+        </nav>
+
+        {/* Bottom Actions */}
+        <div className="p-6 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-sm text-gray-600 dark:text-gray-300">الوضع</span>
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            >
+              {isDark ? <Sun className="w-5 h-5 text-gray-600 dark:text-gray-300" /> : <Moon className="w-5 h-5 text-gray-600 dark:text-gray-300" />}
+            </button>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center justify-center py-3 px-4 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
+          >
+            <LogOut className="w-5 h-5 ml-2" />
+            تسجيل الخروج
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Header */}
+      <div className="lg:hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 flex items-center justify-between">
+        <div className="flex items-center">
+          <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center mr-3">
+            <Shield className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h1 className="text-lg font-bold text-gray-900 dark:text-white">لوحة الإدارة</h1>
+          </div>
+        </div>
+        
+        <div className="flex items-center space-x-3 space-x-reverse">
+          <button
+            onClick={toggleTheme}
+            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          >
+            {isDark ? <Sun className="w-5 h-5 text-gray-600 dark:text-gray-300" /> : <Moon className="w-5 h-5 text-gray-600 dark:text-gray-300" />}
+          </button>
+          <button
+            onClick={() => setIsProfileOpen(!isProfileOpen)}
+            className="w-8 h-8 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center"
+          >
+            <User className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Profile Dropdown */}
+      <AnimatePresence>
+        {isProfileOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="lg:hidden absolute top-16 left-4 right-4 bg-white dark:bg-gray-800 rounded-xl shadow-luxury border border-gray-200 dark:border-gray-700 z-50"
+          >
+            <div className="p-4">
+              <div className="flex items-center mb-4">
+                <div className="w-10 h-10 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center mr-3">
+                  <User className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 dark:text-white">{adminUser?.name}</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">مدير المنصة</p>
+                </div>
+              </div>
               
-              <div className="flex items-center space-x-3 space-x-reverse">
-                <span className="text-gray-700 dark:text-gray-300">
-                  {adminUser?.name}
-                </span>
+              <div className="space-y-2">
+                <button
+                  onClick={() => {
+                    navigate('/');
+                    setIsProfileOpen(false);
+                  }}
+                  className="w-full flex items-center p-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                >
+                  <Settings className="w-5 h-5 ml-3" />
+                  عرض المنصة
+                </button>
+                <hr className="my-2 border-gray-200 dark:border-gray-600" />
                 <button
                   onClick={handleLogout}
-                  className="flex items-center text-gray-600 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                  className="w-full flex items-center p-3 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                 >
-                  <LogOut className="w-5 h-5 ml-1" />
+                  <LogOut className="w-5 h-5 ml-3" />
                   تسجيل الخروج
                 </button>
               </div>
             </div>
-          </div>
-        </div>
-      </header>
-      
-      {/* Admin Navigation */}
-      <nav className="bg-primary-600 dark:bg-primary-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex space-x-8 space-x-reverse">
-            <button
-              onClick={() => navigate('/admin/dashboard')}
-              className="flex items-center px-3 py-4 text-sm font-medium text-white hover:text-primary-100 transition-colors"
-            >
-              <Home className="w-4 h-4 ml-2" />
-              الرئيسية
-            </button>
-            <button
-              onClick={() => navigate('/admin/teachers')}
-              className="flex items-center px-3 py-4 text-sm font-medium text-white hover:text-primary-100 transition-colors"
-            >
-              <Users className="w-4 h-4 ml-2" />
-              إدارة المعلمين
-            </button>
-            <button
-              onClick={() => navigate('/admin/create-lesson')}
-              className="flex items-center px-3 py-4 text-sm font-medium text-white hover:text-primary-100 transition-colors"
-            >
-              <BookOpen className="w-4 h-4 ml-2" />
-              إضافة درس
-            </button>
-            <button
-              onClick={() => navigate('/')}
-              className="flex items-center px-3 py-4 text-sm font-medium text-white hover:text-primary-100 transition-colors"
-            >
-              <Users className="w-4 h-4 ml-2" />
-              عرض المنصة
-            </button>
-          </div>
-        </div>
-      </nav>
-      
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Main Content */}
-      <main>
-        <Outlet />
-      </main>
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <main className="flex-1 overflow-auto pb-20 lg:pb-0">
+          <Outlet />
+        </main>
+      </div>
+
+      {/* Mobile Bottom Navigation */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shadow-luxury z-40">
+        <div className="grid grid-cols-4 h-16">
+          {sidebarItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => handleNavigation(item.path)}
+              className={`flex flex-col items-center justify-center space-y-1 transition-all ${
+                isActivePath(item.path)
+                  ? 'text-gray-900 dark:text-white bg-gray-100 dark:bg-gray-700'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+              }`}
+            >
+              <item.icon className="w-5 h-5" />
+              <span className="text-xs font-medium">{item.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Mobile Overlay */}
+      {isProfileOpen && (
+        <div 
+          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
+          onClick={() => setIsProfileOpen(false)}
+        />
+      )}
     </div>
   );
 };

@@ -62,7 +62,7 @@ const ChatbotPage: React.FC = () => {
   ];
 
   return (
-    <div className="p-3 lg:p-6 h-full">
+    <div className="h-full flex flex-col p-4 lg:p-6">
       <motion.div
         initial="hidden"
         animate="visible"
@@ -79,11 +79,11 @@ const ChatbotPage: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-6 min-h-0">
           {/* Chat Area */}
-          <div className="lg:col-span-3 card flex flex-col h-[500px] lg:h-[600px]">
+          <div className="lg:col-span-3 card flex flex-col" style={{ height: 'calc(100vh - 200px)' }}>
             {/* Chat Header */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
               <div className="flex items-center">
                 <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mr-3">
                   <Bot className="w-6 h-6 text-blue-600 dark:text-blue-400" />
@@ -191,7 +191,7 @@ const ChatbotPage: React.FC = () => {
             </div>
 
             {/* Input */}
-            <form onSubmit={handleSendMessage} className="p-3 lg:p-4 border-t border-gray-200 dark:border-gray-700">
+            <form onSubmit={handleSendMessage} className="p-3 lg:p-4 border-t border-gray-200 dark:border-gray-700 flex-shrink-0">
               <div className="flex items-center space-x-3 space-x-reverse">
                 <input
                   type="text"

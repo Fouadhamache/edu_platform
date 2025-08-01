@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  BookOpen, 
+  Home, 
   FileText, 
   Target, 
   ClipboardList, 
@@ -16,7 +16,7 @@ import {
   Settings,
   TrendingUp,
   Heart,
-  Home
+  ChevronRight
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
@@ -31,9 +31,9 @@ const StudentLayout: React.FC = () => {
 
   const sidebarItems = [
     { id: 'dashboard', label: 'الرئيسية', icon: Home, path: '/dashboard' },
-    { id: 'summaries', label: 'الملخصات', icon: FileText, path: '/summaries' },
     { id: 'assignments', label: 'الواجبات', icon: ClipboardList, path: '/assignments' },
     { id: 'tests', label: 'الاختبارات', icon: Target, path: '/tests' },
+    { id: 'summaries', label: 'الملخصات', icon: FileText, path: '/summaries' },
     { id: 'chatbot', label: 'المساعد الذكي', icon: MessageCircle, path: '/chatbot' },
   ];
 
@@ -74,8 +74,8 @@ const StudentLayout: React.FC = () => {
         {/* Sidebar Header */}
         <div className="p-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center">
-            <div className="w-10 h-10 bg-gray-900 dark:bg-white rounded-xl flex items-center justify-center mr-3">
-              <BookOpen className="w-6 h-6 text-white dark:text-gray-900" />
+            <div className="w-12 h-12 bg-gray-900 dark:bg-white rounded-xl flex items-center justify-center mr-3">
+              <span className="text-lg font-bold text-white dark:text-gray-900">ق</span>
             </div>
             <div>
               <h1 className="text-xl font-bold text-gray-900 dark:text-white">منصة قلم</h1>
@@ -86,9 +86,11 @@ const StudentLayout: React.FC = () => {
 
         {/* User Profile Section */}
         <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-          <div className="flex items-center">
+          <div className="flex items-center mb-4">
             <div className="w-12 h-12 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center mr-3">
-              <User className="w-6 h-6 text-gray-600 dark:text-gray-300" />
+              <span className="text-lg font-bold text-gray-600 dark:text-gray-300">
+                {getDisplayName().charAt(0)}
+              </span>
             </div>
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -96,25 +98,56 @@ const StudentLayout: React.FC = () => {
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-300">طالب</p>
             </div>
+            <button
+              onClick={() => setIsProfileOpen(!isProfileOpen)}
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            >
+              <ChevronRight className={`w-4 h-4 text-gray-500 transition-transform ${isProfileOpen ? 'rotate-90' : ''}`} />
+            </button>
           </div>
           
-          {/* Quick Actions */}
-          <div className="mt-4 flex space-x-2 space-x-reverse">
-            <button
-              onClick={() => navigate('/profile')}
-              className="flex-1 flex items-center justify-center py-2 px-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-sm"
-            >
-              <Settings className="w-4 h-4 ml-1" />
-              الملف الشخصي
-            </button>
-            <button
-              onClick={() => navigate('/progress')}
-              className="flex-1 flex items-center justify-center py-2 px-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-sm"
-            >
-              <TrendingUp className="w-4 h-4 ml-1" />
-              التقدم
-            </button>
-          </div>
+          {/* Profile Dropdown */}
+          <AnimatePresence>
+            {isProfileOpen && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="space-y-2"
+              >
+                <button
+                  onClick={() => {
+                    navigate('/profile');
+                    setIsProfileOpen(false);
+                  }}
+                  className="w-full flex items-center p-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors text-sm"
+                >
+                  <Settings className="w-4 h-4 ml-3" />
+                  الملف الشخصي
+                </button>
+                <button
+                  onClick={() => {
+                    navigate('/progress');
+                    setIsProfileOpen(false);
+                  }}
+                  className="w-full flex items-center p-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors text-sm"
+                >
+                  <TrendingUp className="w-4 h-4 ml-3" />
+                  التقدم الدراسي
+                </button>
+                <button
+                  onClick={() => {
+                    navigate('/saved-lessons');
+                    setIsProfileOpen(false);
+                  }}
+                  className="w-full flex items-center p-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors text-sm"
+                >
+                  <Heart className="w-4 h-4 ml-3" />
+                  الدروس المحفوظة
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Navigation Items */}
@@ -162,7 +195,7 @@ const StudentLayout: React.FC = () => {
       <div className="lg:hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 flex items-center justify-between">
         <div className="flex items-center">
           <div className="w-8 h-8 bg-gray-900 dark:bg-white rounded-lg flex items-center justify-center mr-3">
-            <BookOpen className="w-5 h-5 text-white dark:text-gray-900" />
+            <span className="text-sm font-bold text-white dark:text-gray-900">ق</span>
           </div>
           <div>
             <h1 className="text-lg font-bold text-gray-900 dark:text-white">منصة قلم</h1>
@@ -180,7 +213,9 @@ const StudentLayout: React.FC = () => {
             onClick={() => setIsProfileOpen(!isProfileOpen)}
             className="w-8 h-8 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center"
           >
-            <User className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+            <span className="text-sm font-bold text-gray-600 dark:text-gray-300">
+              {getDisplayName().charAt(0)}
+            </span>
           </button>
         </div>
       </div>
@@ -197,7 +232,9 @@ const StudentLayout: React.FC = () => {
             <div className="p-4">
               <div className="flex items-center mb-4">
                 <div className="w-10 h-10 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center mr-3">
-                  <User className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                  <span className="text-lg font-bold text-gray-600 dark:text-gray-300">
+                    {getDisplayName().charAt(0)}
+                  </span>
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900 dark:text-white">{getDisplayName()}</h3>
@@ -279,13 +316,10 @@ const StudentLayout: React.FC = () => {
       </div>
 
       {/* Mobile Overlay */}
-      {(isSidebarOpen || isProfileOpen) && (
+      {isProfileOpen && (
         <div 
           className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
-          onClick={() => {
-            setIsSidebarOpen(false);
-            setIsProfileOpen(false);
-          }}
+          onClick={() => setIsProfileOpen(false)}
         />
       )}
     </div>

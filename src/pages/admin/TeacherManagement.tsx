@@ -109,7 +109,7 @@ const TeacherManagement: React.FC = () => {
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+        className="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto mx-4"
       >
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
           إضافة معلم جديد
@@ -126,6 +126,7 @@ const TeacherManagement: React.FC = () => {
                 value={formData.name}
                 onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                 className="input-field"
+                placeholder="أدخل الاسم الكامل"
                 required
               />
             </div>
@@ -139,6 +140,7 @@ const TeacherManagement: React.FC = () => {
                 value={formData.email}
                 onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                 className="input-field"
+                placeholder="example@email.com"
                 required
               />
             </div>
@@ -152,6 +154,7 @@ const TeacherManagement: React.FC = () => {
                 value={formData.password}
                 onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
                 className="input-field"
+                placeholder="أدخل كلمة المرور"
                 required
               />
             </div>
@@ -165,6 +168,7 @@ const TeacherManagement: React.FC = () => {
                 value={formData.phone}
                 onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
                 className="input-field"
+                placeholder="+213 555 123 456"
               />
             </div>
             
