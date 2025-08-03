@@ -17,8 +17,7 @@ export default defineConfig({
           vendor: ['react', 'react-dom'],
           router: ['react-router-dom'],
           motion: ['framer-motion'],
-          icons: ['lucide-react'],
-          database: ['mongoose']
+          icons: ['lucide-react']
         }
       }
     }
