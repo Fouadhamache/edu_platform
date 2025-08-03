@@ -104,7 +104,7 @@ body {
 }
 
 /* Mobile-specific optimizations */
-@media (max-width: 1024px) {
+@media (max-width: 768px) {
   /* Improve touch targets */
   button, a, input, select, textarea {
     min-height: 44px;
@@ -140,7 +140,7 @@ body {
   
   /* Mobile bottom navigation safe area */
   .pb-20 {
-    padding-bottom: 5rem;
+    padding-bottom: 6rem;
   }
   
   /* Ensure proper mobile layout */

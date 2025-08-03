@@ -70,7 +70,7 @@ const StudentLayout: React.FC = () => {
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden">
       {/* Desktop Sidebar */}
-      <div className="hidden lg:flex lg:flex-col lg:w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-luxury">
+      <div className="hidden md:flex md:flex-col md:w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-luxury">
         {/* Sidebar Header */}
         <div className="p-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center">
@@ -192,7 +192,7 @@ const StudentLayout: React.FC = () => {
       </div>
 
       {/* Mobile Header */}
-      <div className="lg:hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 flex items-center justify-between">
+      <div className="md:hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 flex items-center justify-between">
         <div className="flex items-center">
           <div className="w-8 h-8 bg-gray-900 dark:bg-white rounded-lg flex items-center justify-center mr-3">
             <span className="text-sm font-bold text-white dark:text-gray-900">ق</span>
@@ -227,7 +227,7 @@ const StudentLayout: React.FC = () => {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="lg:hidden absolute top-16 left-4 right-4 bg-white dark:bg-gray-800 rounded-xl shadow-luxury border border-gray-200 dark:border-gray-700 z-50"
+            className="md:hidden absolute top-16 left-4 right-4 bg-white dark:bg-gray-800 rounded-xl shadow-luxury border border-gray-200 dark:border-gray-700 z-50"
           >
             <div className="p-4">
               <div className="flex items-center mb-4">
@@ -290,13 +290,13 @@ const StudentLayout: React.FC = () => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Page Content */}
-        <main className="flex-1 overflow-auto pb-20 lg:pb-0">
+        <main className="flex-1 overflow-auto pb-20 md:pb-0">
           <Outlet />
         </main>
       </div>
 
       {/* Mobile Bottom Navigation */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shadow-luxury z-40">
+      <div className="md:hidden fixed bottom-1 left-2 right-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-luxury z-40 rounded-2xl">
         <div className="grid grid-cols-5 h-16">
           {sidebarItems.map((item) => (
             <button
@@ -318,7 +318,7 @@ const StudentLayout: React.FC = () => {
       {/* Mobile Overlay */}
       {isProfileOpen && (
         <div 
-          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
+          className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
           onClick={() => setIsProfileOpen(false)}
         />
       )}
