@@ -69,8 +69,8 @@ const StudentLayout: React.FC = () => {
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden">
-      {/* Desktop Sidebar */}
-      <div className="hidden md:flex md:flex-col md:w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-luxury">
+      {/* Desktop Sidebar - Hidden on Mobile/Tablet */}
+      <div className="hidden xl:flex xl:flex-col xl:w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-luxury">
         {/* Sidebar Header */}
         <div className="p-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center">
@@ -191,18 +191,33 @@ const StudentLayout: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile Header */}
-      <div className="md:hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 flex items-center justify-between">
+      {/* Mobile/Tablet Header */}
+      <div className="xl:hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 flex items-center justify-between">
         <div className="flex items-center">
           <div className="w-8 h-8 bg-gray-900 dark:bg-white rounded-lg flex items-center justify-center mr-3">
             <span className="text-sm font-bold text-white dark:text-gray-900">ق</span>
           </div>
-          <div>
+          <div className="hidden sm:block">
             <h1 className="text-lg font-bold text-gray-900 dark:text-white">منصة قلم</h1>
+          </div>
+          <div className="sm:hidden">
+            <button
+              onClick={() => setIsProfileOpen(!isProfileOpen)}
+              className="flex items-center space-x-2 space-x-reverse"
+            >
+              <span className="text-lg font-bold text-gray-900 dark:text-white">
+                مرحباً، {getDisplayName()}
+              </span>
+              <div className="w-6 h-6 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center">
+                <span className="text-sm font-bold text-gray-600 dark:text-gray-300">
+                  {getDisplayName().charAt(0)}
+                </span>
+              </div>
+            </button>
           </div>
         </div>
         
-        <div className="flex items-center space-x-3 space-x-reverse">
+        <div className="hidden sm:flex items-center space-x-3 space-x-reverse">
           <button
             onClick={toggleTheme}
             className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
@@ -227,7 +242,7 @@ const StudentLayout: React.FC = () => {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="md:hidden absolute top-16 left-4 right-4 bg-white dark:bg-gray-800 rounded-xl shadow-luxury border border-gray-200 dark:border-gray-700 z-50"
+            className="xl:hidden absolute top-16 left-4 right-4 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-xl shadow-luxury border border-gray-200/50 dark:border-gray-700/50 z-50"
           >
             <div className="p-4">
               <div className="flex items-center mb-4">
@@ -296,7 +311,7 @@ const StudentLayout: React.FC = () => {
       </div>
 
       {/* Mobile Bottom Navigation */}
-      <div className="md:hidden fixed bottom-1 left-2 right-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-luxury z-40 rounded-2xl">
+      <div className="xl:hidden fixed bottom-2 left-3 right-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border border-gray-200/30 dark:border-gray-700/30 shadow-luxury z-40 rounded-2xl">
         <div className="grid grid-cols-5 h-16">
           {sidebarItems.map((item) => (
             <button
@@ -318,7 +333,7 @@ const StudentLayout: React.FC = () => {
       {/* Mobile Overlay */}
       {isProfileOpen && (
         <div 
-          className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
+          className="xl:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
           onClick={() => setIsProfileOpen(false)}
         />
       )}
