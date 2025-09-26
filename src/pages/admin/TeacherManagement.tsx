@@ -1,23 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Plus, 
-  Search, 
-  Filter, 
-  Edit, 
-  Trash2, 
-  Eye, 
-  UserPlus,
-  BookOpen,
-  Settings,
-  Mail,
-  Phone,
-  GraduationCap,
-  Award,
-  Users,
-  CheckCircle,
-  XCircle
-} from 'lucide-react';
+import { Plus, Search, Filter, CreditCard as Edit, Trash2, Eye, UserPlus, BookOpen, Settings, Mail, Phone, GraduationCap, Award, Users, CheckCircle, XCircle } from 'lucide-react';
 import { useTeacher } from '../../contexts/TeacherContext';
 import { EDUCATION_LEVELS, SUBJECTS_BY_LEVEL } from '../../types/education';
 import type { Teacher, AssignedSubject } from '../../types/teacher';
