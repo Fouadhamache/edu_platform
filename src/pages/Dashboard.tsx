@@ -27,7 +27,6 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import { useTrial } from '../contexts/TrialContext';
 import { useLesson } from '../contexts/LessonContext';
-import { useTeacher } from '../contexts/TeacherContext';
 import { SUBJECTS_BY_LEVEL, EDUCATION_LEVELS } from '../types/education';
 
 const semesters = [
@@ -78,7 +77,6 @@ const Dashboard: React.FC = () => {
   const { user } = useAuth();
   const { isTrialActive, remainingTime } = useTrial();
   const { getSubjectProgress, userProgress } = useLesson();
-  const { getAllPublishedLessons } = useTeacher();
   
   const fadeIn = {
     hidden: { opacity: 0, y: 20 },
@@ -158,21 +156,18 @@ const Dashboard: React.FC = () => {
 
   // Calculate real statistics from user progress
   const calculateStats = () => {
-    const publishedLessons = getAllPublishedLessons();
     const completedLessons = userProgress.filter(p => p.completed).length;
     const totalQuizzes = userProgress.reduce((sum, p) => sum + p.quizScores.length, 0);
     const totalTimeSpent = Math.round(userProgress.reduce((sum, p) => sum + p.timeSpent, 0) / 60); // Convert to hours
     const averageScore = userProgress.length > 0 
       ? Math.round(userProgress.reduce((sum, p) => sum + p.progress, 0) / userProgress.length)
       : 0;
-    const totalAvailableLessons = publishedLessons.length;
 
     return {
       completedLessons,
       totalQuizzes,
       totalTimeSpent,
-      averageScore,
-      totalAvailableLessons
+      averageScore
     };
   };
 
@@ -253,7 +248,7 @@ const Dashboard: React.FC = () => {
           {[
             { 
               title: 'الدروس المكتملة', 
-              value: `${stats.completedLessons}/${stats.totalAvailableLessons}`, 
+              value: stats.completedLessons.toString(), 
               icon: BookOpen, 
               color: 'text-gray-700 dark:text-gray-300',
               bgColor: 'bg-blue-50 dark:bg-blue-900/20',
@@ -357,9 +352,7 @@ const Dashboard: React.FC = () => {
               {subjects.map((subject, index) => {
                 const hoverClass = getSubjectHoverClass(index);
                 const progress = getSubjectProgress(subject.id);
-                const publishedLessons = getAllPublishedLessons();
-                const subjectLessons = publishedLessons.filter(lesson => lesson.subjectId === subject.id);
-                const lessonsCount = subjectLessons.length;
+                const lessonsCount = 20; // This would come from actual data
                 const completedLessons = Math.round((progress / 100) * lessonsCount);
                 
                 return (
