@@ -1,13 +1,13 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { 
-  BookOpen, 
-  Video, 
-  FileText, 
-  ListChecks, 
-  Users, 
-  Clock, 
+import {
+  BookOpen,
+  Video,
+  FileText,
+  ListChecks,
+  Users,
+  Clock,
   Award,
   GraduationCap,
   Target,
@@ -18,7 +18,8 @@ import {
   Star,
   Zap,
   Brain,
-  Trophy
+  Trophy,
+  Shield
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTrial } from '../contexts/TrialContext';
