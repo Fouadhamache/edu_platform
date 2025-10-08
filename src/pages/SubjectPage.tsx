@@ -26,6 +26,7 @@ import {
   Target
 } from 'lucide-react';
 import { useLesson } from '../contexts/LessonContext';
+import { useTeacher } from '../contexts/TeacherContext';
 import { SUBJECTS_BY_LEVEL } from '../types/education';
 
 // Fake subject data for demonstration
@@ -51,33 +52,6 @@ const getSemesterName = (id: string) => {
     '3': 'الفصل الثالث',
   };
   return semesters[id as keyof typeof semesters];
-};
-
-// Generate fake lessons for demonstration
-const generateLessons = (subjectId: string) => {
-  return Array.from({ length: 20 }, (_, i) => ({
-    id: `${subjectId}-${i + 1}`,
-    title: `الدرس ${i + 1}: ${getRandomLessonTitle(subjectId)}`,
-    description: `وصف شامل للدرس ${i + 1} في مادة ${getSubjectDetails(subjectId)?.name}`,
-    duration: Math.floor(Math.random() * 30) + 15,
-    hasQuiz: Math.random() > 0.5,
-    hasExercises: Math.random() > 0.3,
-    difficulty: ['سهل', 'متوسط', 'صعب'][Math.floor(Math.random() * 3)],
-    instructor: 'أ. محمد أحمد',
-    rating: (4 + Math.random()).toFixed(1),
-    views: Math.floor(Math.random() * 1000) + 100,
-  }));
-};
-
-const getRandomLessonTitle = (subjectId: string) => {
-  const titles = {
-    'mathematics': ['المعادلات التفاضلية', 'النهايات والاتصال', 'التكامل', 'المصفوفات', 'الهندسة التحليلية'],
-    'physics': ['الحركة المستقيمة', 'قوانين نيوتن', 'الطاقة والشغل', 'الكهرباء الساكنة', 'المغناطيسية'],
-    'chemistry': ['التفاعلات الكيميائية', 'الجدول الدوري', 'الروابط الكيميائية', 'الأحماض والقواعد', 'الكيمياء العضوية'],
-    'arabic': ['النحو والصرف', 'البلاغة', 'الأدب العربي', 'الشعر الجاهلي', 'النثر الحديث'],
-  };
-  const subjectTitles = titles[subjectId as keyof typeof titles] || ['موضوع عام'];
-  return subjectTitles[Math.floor(Math.random() * subjectTitles.length)];
 };
 
 interface LessonViewProps {
@@ -460,10 +434,27 @@ const SubjectPage: React.FC = () => {
   const { semesterId, subjectId } = useParams<{ semesterId: string; subjectId: string }>();
   const [selectedLesson, setSelectedLesson] = useState<string | null>(null);
   const { loadLesson, getLessonProgress } = useLesson();
+  const { getAllPublishedLessons } = useTeacher();
   
   const subject = getSubjectDetails(subjectId || 'mathematics');
   const semesterName = getSemesterName(semesterId || '1');
-  const lessons = generateLessons(subjectId || 'mathematics');
+  
+  // Get published lessons for this subject
+  const publishedLessons = getAllPublishedLessons();
+  const lessons = publishedLessons
+    .filter(lesson => lesson.subjectId === subjectId)
+    .map(lesson => ({
+      id: lesson.id,
+      title: lesson.title,
+      description: lesson.description,
+      duration: lesson.duration,
+      hasQuiz: lesson.exercises.length > 0,
+      hasExercises: lesson.exercises.length > 0,
+      difficulty: 'متوسط',
+      instructor: lesson.teacherName,
+      rating: '4.8',
+      views: Math.floor(Math.random() * 1000) + 100,
+    }));
   
   if (!subject) {
     return <div>المادة غير موجودة</div>;
@@ -519,7 +510,8 @@ const SubjectPage: React.FC = () => {
       </div>
 
       {/* Enhanced Lessons Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
+      {lessons.length > 0 ? (
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
         {lessons.map((lesson, index) => {
           const progress = getLessonProgress(lesson.id);
           const isCompleted = progress?.completed || false;
@@ -627,7 +619,18 @@ const SubjectPage: React.FC = () => {
             </motion.div>
           );
         })}
-      </div>
+        </div>
+      ) : (
+        <div className="text-center py-12">
+          <BookOpenCheck className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+            لا توجد دروس منشورة
+          </h3>
+          <p className="text-gray-600 dark:text-gray-300">
+            لم يتم نشر أي دروس في هذه المادة بعد. يرجى المحاولة لاحقاً.
+          </p>
+        </div>
+      )}
     </div>
   );
 };
