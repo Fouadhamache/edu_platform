@@ -147,23 +147,6 @@ body {
   .min-h-0 {
     min-height: 0;
   }
-  
-  /* Fix layout issues on mobile */
-  .overflow-hidden {
-    overflow: hidden;
-  }
-  
-  /* Ensure full height containers */
-  .h-screen {
-    height: 100vh;
-    height: 100dvh; /* Dynamic viewport height for mobile browsers */
-  }
-  
-  /* Fix sidebar and content layout */
-  .flex-1 {
-    flex: 1 1 0%;
-    min-height: 0;
-  }
 }
 
 /* iOS Safari specific fixes */
@@ -171,18 +154,11 @@ body {
   /* Fix viewport height on iOS */
   .min-h-screen {
     min-height: -webkit-fill-available;
-    min-height: 100dvh;
   }
   
   /* Improve touch scrolling */
   * {
     -webkit-overflow-scrolling: touch;
-  }
-  
-  /* Fix iOS viewport issues */
-  .h-screen {
-    height: -webkit-fill-available;
-    height: 100dvh;
   }
 }
 
@@ -196,12 +172,6 @@ body {
   /* Prevent zoom on input focus */
   input, select, textarea {
     font-size: 16px;
-  }
-  
-  /* Fix Android viewport */
-  .h-screen {
-    height: 100vh;
-    height: 100dvh;
   }
 }
 
@@ -241,47 +211,4 @@ body {
 .hover-lift:hover {
   transform: translateY(-4px);
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-}
-
-/* Fix layout issues */
-.layout-container {
-  display: flex;
-  height: 100vh;
-  height: 100dvh;
-  overflow: hidden;
-}
-
-.main-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.content-area {
-  flex: 1;
-  overflow-y: auto;
-  min-height: 0;
-}
-
-/* Ensure proper scrolling on all devices */
-.scrollable {
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
-}
-
-/* Fix glassmorphism effects */
-.glass-nav {
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.dark .glass-nav {
-  background: rgba(31, 41, 55, 0.8);
-  border: 1px solid rgba(75, 85, 99, 0.3);
 }
