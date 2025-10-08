@@ -1,23 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Plus, 
-  Search, 
-  Filter, 
-  Edit, 
-  Trash2, 
-  Eye, 
-  UserPlus,
-  BookOpen,
-  Settings,
-  Mail,
-  Phone,
-  GraduationCap,
-  Award,
-  Users,
-  CheckCircle,
-  XCircle
-} from 'lucide-react';
+import { Plus, Search, Filter, CreditCard as Edit, Trash2, Eye, UserPlus, BookOpen, Settings, Mail, Phone, GraduationCap, Award, Users, CheckCircle, XCircle } from 'lucide-react';
 import { useTeacher } from '../../contexts/TeacherContext';
 import { EDUCATION_LEVELS, SUBJECTS_BY_LEVEL } from '../../types/education';
 import type { Teacher, AssignedSubject } from '../../types/teacher';
@@ -42,13 +25,12 @@ const TeacherManagement: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    password: '',
     phone: '',
-    bio: '',
+    password: '',
     specialization: '',
-    experience: 0,
-    isActive: true
+    experience: 0
   });
+  const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
 
   const fadeIn = {
     hidden: { opacity: 0, y: 20 },
@@ -70,28 +52,76 @@ const TeacherManagement: React.FC = () => {
   const handleCreateTeacher = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (selectedSubjects.length === 0) {
+      alert('يرجى اختيار مادة واحدة على الأقل');
+      return;
+    }
+    
     try {
+      // Create assigned subjects based on selections
+      const assignedSubjects: AssignedSubject[] = selectedSubjects.map(subjectId => {
+        const subject = getAllSubjects().find(s => s.id === subjectId);
+        return {
+          id: `${formData.specialization}-${subjectId}-${Date.now()}`,
+          level: 'secondary',
+          year: 3,
+          subjectId,
+          subjectName: subject?.name || '',
+          canCreateLessons: true,
+          canEditLessons: true,
+          canDeleteLessons: false,
+          canManageExercises: true,
+          canManageFlashcards: true
+        };
+      });
+      
       await createTeacher({
         ...formData,
-        assignedSubjects: []
+        bio: `معلم ${formData.specialization} مع ${formData.experience} سنوات خبرة`,
+        assignedSubjects,
+        isActive: true
       });
       
       setShowCreateModal(false);
       setFormData({
         name: '',
         email: '',
-        password: '',
         phone: '',
-        bio: '',
+        password: '',
         specialization: '',
-        experience: 0,
-        isActive: true
+        experience: 0
       });
+      setSelectedSubjects([]);
       alert('تم إنشاء المعلم بنجاح');
     } catch (error) {
       console.error('Error creating teacher:', error);
       alert('حدث خطأ أثناء إنشاء المعلم');
     }
+  };
+
+  const getAllSubjects = () => {
+    return [
+      { id: 'mathematics', name: 'الرياضيات' },
+      { id: 'physics', name: 'الفيزياء' },
+      { id: 'chemistry', name: 'الكيمياء' },
+      { id: 'arabic', name: 'اللغة العربية' },
+      { id: 'french', name: 'اللغة الفرنسية' },
+      { id: 'english', name: 'اللغة الإنجليزية' },
+      { id: 'history-geography', name: 'التاريخ والجغرافيا' },
+      { id: 'philosophy', name: 'الفلسفة' },
+      { id: 'islamic', name: 'العلوم الإسلامية' },
+      { id: 'natural-sciences', name: 'العلوم الطبيعية' },
+      { id: 'economics', name: 'الاقتصاد' },
+      { id: 'technology', name: 'التكنولوجيا' }
+    ];
+  };
+
+  const handleSubjectToggle = (subjectId: string) => {
+    setSelectedSubjects(prev => 
+      prev.includes(subjectId) 
+        ? prev.filter(id => id !== subjectId)
+        : [...prev, subjectId]
+    );
   };
 
   const handleDeleteTeacher = async (teacherId: string) => {
@@ -109,14 +139,14 @@ const TeacherManagement: React.FC = () => {
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto mx-4"
+        className="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto mx-4"
       >
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
           إضافة معلم جديد
         </h2>
         
         <form onSubmit={handleCreateTeacher} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             <div>
               <label className="block text-gray-700 dark:text-gray-300 mb-2">
                 الاسم الكامل
@@ -147,6 +177,20 @@ const TeacherManagement: React.FC = () => {
             
             <div>
               <label className="block text-gray-700 dark:text-gray-300 mb-2">
+                رقم الهاتف
+              </label>
+              <input
+                type="tel"
+                value={formData.phone}
+                onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                className="input-field"
+                placeholder="+213 555 123 456"
+                required
+              />
+            </div>
+            
+            <div>
+              <label className="block text-gray-700 dark:text-gray-300 mb-2">
                 كلمة المرور
               </label>
               <input
@@ -156,19 +200,6 @@ const TeacherManagement: React.FC = () => {
                 className="input-field"
                 placeholder="أدخل كلمة المرور"
                 required
-              />
-            </div>
-            
-            <div>
-              <label className="block text-gray-700 dark:text-gray-300 mb-2">
-                رقم الهاتف
-              </label>
-              <input
-                type="tel"
-                value={formData.phone}
-                onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                className="input-field"
-                placeholder="+213 555 123 456"
               />
             </div>
             
@@ -212,29 +243,24 @@ const TeacherManagement: React.FC = () => {
           </div>
           
           <div>
-            <label className="block text-gray-700 dark:text-gray-300 mb-2">
-              نبذة شخصية
+            <label className="block text-gray-700 dark:text-gray-300 mb-3">
+              المواد التي يدرسها (يمكن اختيار أكثر من مادة)
             </label>
-            <textarea
-              value={formData.bio}
-              onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
-              className="input-field"
-              rows={3}
-              placeholder="نبذة مختصرة عن المعلم..."
-            />
-          </div>
-          
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="isActive"
-              checked={formData.isActive}
-              onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))}
-              className="mr-2"
-            />
-            <label htmlFor="isActive" className="text-gray-700 dark:text-gray-300">
-              تفعيل الحساب
-            </label>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-48 overflow-y-auto border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+              {getAllSubjects().map((subject) => (
+                <label key={subject.id} className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={selectedSubjects.includes(subject.id)}
+                    onChange={() => handleSubjectToggle(subject.id)}
+                    className="mr-2"
+                  />
+                  <span className="text-sm text-gray-700 dark:text-gray-300">
+                    {subject.name}
+                  </span>
+                </label>
+              ))}
+            </div>
           </div>
           
           <div className="flex justify-end space-x-4 space-x-reverse pt-4">

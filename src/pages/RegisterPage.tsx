@@ -1,725 +1,296 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { 
-  Lock, 
-  Mail, 
-  User, 
-  GraduationCap, 
-  ChevronRight, 
-  ChevronLeft,
-  Users,
-  School,
-  Settings
-} from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { useTrial } from '../contexts/TrialContext';
-import { 
-  EDUCATION_LEVELS, 
-  type EducationalLevel, 
-  type SecondaryStream, 
-  type EducationInfo,
-  type PrimaryGrade,
-  type MiddleGrade,
-  type SecondaryYear,
-  type TechnicalSpecialization,
-  type ForeignLanguageChoice
-} from '../types/education';
-import { motion, AnimatePresence } from 'framer-motion';
-
-type UserType = 'student' | 'guardian';
-
-interface FormData {
-  userType: UserType;
-  guardianName: string;
-  studentName: string;
-  level: EducationalLevel;
-  year: PrimaryGrade | MiddleGrade | SecondaryYear;
-  stream: SecondaryStream;
-  technicalSpecialization: TechnicalSpecialization;
-  foreignLanguageChoice: ForeignLanguageChoice;
-  email: string;
-  password: string;
-  confirmPassword: string;
-}
+import { Link, useNavigate } from 'react-router-dom';
+import { User, Mail, Phone, Eye, EyeOff, ArrowLeft, ArrowRight, Check } from 'lucide-react';
 
 const RegisterPage: React.FC = () => {
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState<FormData>({
-    userType: 'student',
-    guardianName: '',
+  const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    userType: '',
     studentName: '',
-    level: 'primary',
-    year: 1,
-    stream: 'cst',
-    technicalSpecialization: 'electrical',
-    foreignLanguageChoice: 'spanish',
+    guardianName: '',
+    registrationMethod: '',
+    educationLevel: '',
+    year: '',
+    stream: '',
+    technicalSpecialization: '',
+    foreignLanguage: '',
     email: '',
+    phone: '',
     password: '',
     confirmPassword: ''
   });
-  
-  const [error, setError] = useState('');
-  const { register, isLoading } = useAuth();
-  const navigate = useNavigate();
-  
-  const getTotalSteps = () => {
-    let steps = 6; // Base steps: user type, names, level, year/stream, email, password
-    
-    // Add step for technical specialization if needed
-    if (formData.level === 'secondary' && 
-        formData.year > 1 && 
-        formData.stream === 'technical-mathematics') {
-      steps += 1;
-    }
-    
-    // Add step for foreign language choice if needed
-    if (formData.level === 'secondary' && 
-        formData.year > 1 && 
-        formData.stream === 'foreign-languages') {
-      steps += 1;
-    }
-    
-    return steps;
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
-  
-  const slideVariants = {
-    enter: (direction: number) => ({
-      x: direction > 0 ? 1000 : -1000,
-      opacity: 0
-    }),
-    center: {
-      zIndex: 1,
-      x: 0,
-      opacity: 1
-    },
-    exit: (direction: number) => ({
-      zIndex: 0,
-      x: direction < 0 ? 1000 : -1000,
-      opacity: 0
-    })
-  };
-  
+
   const handleNext = () => {
-    if (validateCurrentStep()) {
-      setCurrentStep(prev => prev + 1);
+    // Basic validation for each step
+    if (currentStep === 1 && !formData.userType) {
+      alert('Please select who will use the platform');
+      return;
     }
+    if (currentStep === 2 && !formData.studentName) {
+      alert('Please enter the student\'s name');
+      return;
+    }
+    if (currentStep === 3 && !formData.registrationMethod) {
+      alert('Please choose a registration method');
+      return;
+    }
+    
+    setCurrentStep(prev => prev + 1);
   };
-  
+
   const handleBack = () => {
     setCurrentStep(prev => prev - 1);
   };
-  
-  const validateCurrentStep = () => {
-    setError('');
-    
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Handle registration logic here
+    console.log('Registration data:', formData);
+    navigate('/dashboard');
+  };
+
+  const renderStep = () => {
     switch (currentStep) {
       case 1:
-        return true;
-      case 2:
-        if (formData.userType === 'guardian') {
-          if (!formData.guardianName.trim()) {
-            setError('الرجاء إدخال اسم ولي الأمر');
-            return false;
-          }
-          if (!formData.studentName.trim()) {
-            setError('الرجاء إدخال اسم الطالب');
-            return false;
-          }
-        } else {
-          if (!formData.studentName.trim()) {
-            setError('الرجاء إدخال اسم الطالب');
-            return false;
-          }
-        }
-        return true;
-      case 3:
-        return true;
-      case 4:
-        return true;
-      case 5:
-        // This could be technical specialization, foreign language choice, or email
-        return true;
-      case 6:
-      case 7:
-      case 8:
-        // Handle email step
-        if (isEmailStep()) {
-          if (!formData.email) {
-            setError('الرجاء إدخال البريد الإلكتروني');
-            return false;
-          }
-          if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            setError('الرجاء إدخال بريد إلكتروني صحيح');
-            return false;
-          }
-        }
-        // Handle password step
-        if (isPasswordStep()) {
-          if (!formData.password) {
-            setError('الرجاء إدخال كلمة المرور');
-            return false;
-          }
-          if (formData.password.length < 6) {
-            setError('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
-            return false;
-          }
-          if (formData.password !== formData.confirmPassword) {
-            setError('كلمات المرور غير متطابقة');
-            return false;
-          }
-        }
-        return true;
-      default:
-        return true;
-    }
-  };
-  
-  const isEmailStep = () => {
-    const totalSteps = getTotalSteps();
-    return currentStep === totalSteps - 1;
-  };
-  
-  const isPasswordStep = () => {
-    const totalSteps = getTotalSteps();
-    return currentStep === totalSteps;
-  };
-  
-  const isTechnicalSpecializationStep = () => {
-    return currentStep === 5 && 
-           formData.level === 'secondary' && 
-           formData.year > 1 && 
-           formData.stream === 'technical-mathematics';
-  };
-  
-  const isForeignLanguageChoiceStep = () => {
-    const expectedStep = formData.stream === 'technical-mathematics' ? 6 : 5;
-    return currentStep === expectedStep && 
-           formData.level === 'secondary' && 
-           formData.year > 1 && 
-           formData.stream === 'foreign-languages';
-  };
-  
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validateCurrentStep()) return;
-    
-    const education: EducationInfo = {
-      level: formData.level,
-      year: formData.year,
-      ...(formData.level === 'secondary' ? { stream: formData.stream } : {}),
-      ...(formData.level === 'secondary' && formData.stream === 'technical-mathematics' ? 
-          { technicalSpecialization: formData.technicalSpecialization } : {}),
-      ...(formData.level === 'secondary' && formData.stream === 'foreign-languages' ? 
-          { foreignLanguageChoice: formData.foreignLanguageChoice } : {})
-    };
-    
-    const displayName = formData.userType === 'guardian' 
-      ? `${formData.guardianName} (ولي أمر ${formData.studentName})`
-      : formData.studentName;
-    
-    try {
-      await register(displayName, formData.email, formData.password, education);
-      
-      // Navigate to dashboard - trial will be automatically initiated by TrialContext
-      console.log('Registration successful, navigating to dashboard...');
-      navigate('/dashboard');
-    } catch (err) {
-      setError('فشل إنشاء الحساب. يرجى المحاولة مرة أخرى.');
-    }
-  };
-  
-  const renderStepContent = (step: number) => {
-    switch (step) {
-      case 1:
         return (
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-6">من سيستخدم المنصة؟</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold text-gray-900 text-center">Who will use the platform?</h2>
+            <div className="space-y-4">
               <button
                 type="button"
-                onClick={() => setFormData(prev => ({ ...prev, userType: 'student' }))}
-                className={`p-6 rounded-xl border-2 transition-all ${
+                onClick={() => handleInputChange('userType', 'student')}
+                className={`w-full p-4 border-2 rounded-lg text-left transition-colors ${
                   formData.userType === 'student'
-                    ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
-                    : 'border-gray-200 dark:border-gray-600 hover:border-primary-200 dark:hover:border-primary-400'
+                    ? 'border-indigo-500 bg-indigo-50'
+                    : 'border-gray-200 hover:border-gray-300'
                 }`}
               >
-                <div className="flex flex-col items-center">
-                  <School className="w-12 h-12 text-primary-600 dark:text-primary-400 mb-3" />
-                  <span className="text-lg font-medium text-gray-800 dark:text-gray-200">طالب</span>
+                <div className="flex items-center space-x-3">
+                  <User className="w-6 h-6 text-indigo-600" />
+                  <div>
+                    <h3 className="font-semibold">Student</h3>
+                    <p className="text-sm text-gray-600">I am a student registering for myself</p>
+                  </div>
                 </div>
               </button>
-              
               <button
                 type="button"
-                onClick={() => setFormData(prev => ({ ...prev, userType: 'guardian' }))}
-                className={`p-6 rounded-xl border-2 transition-all ${
+                onClick={() => handleInputChange('userType', 'guardian')}
+                className={`w-full p-4 border-2 rounded-lg text-left transition-colors ${
                   formData.userType === 'guardian'
-                    ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
-                    : 'border-gray-200 dark:border-gray-600 hover:border-primary-200 dark:hover:border-primary-400'
+                    ? 'border-indigo-500 bg-indigo-50'
+                    : 'border-gray-200 hover:border-gray-300'
                 }`}
               >
-                <div className="flex flex-col items-center">
-                  <Users className="w-12 h-12 text-primary-600 dark:text-primary-400 mb-3" />
-                  <span className="text-lg font-medium text-gray-800 dark:text-gray-200">ولي أمر</span>
+                <div className="flex items-center space-x-3">
+                  <User className="w-6 h-6 text-indigo-600" />
+                  <div>
+                    <h3 className="font-semibold">Guardian</h3>
+                    <p className="text-sm text-gray-600">I am registering for my child</p>
+                  </div>
                 </div>
               </button>
             </div>
           </div>
         );
-      
+
       case 2:
         return (
           <div className="space-y-6">
-            <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-6">
-              {formData.userType === 'student' ? 'ما هو اسمك؟' : 'أدخل البيانات المطلوبة'}
-            </h2>
-            
-            {formData.userType === 'guardian' && (
+            <h2 className="text-2xl font-bold text-gray-900 text-center">Enter Names</h2>
+            <div className="space-y-4">
               <div>
-                <label className="block text-gray-700 dark:text-gray-300 mb-2">اسم ولي الأمر</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                    <User className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    type="text"
-                    value={formData.guardianName}
-                    onChange={(e) => setFormData(prev => ({ ...prev, guardianName: e.target.value }))}
-                    className="input-field pr-10"
-                    placeholder="أدخل اسم ولي الأمر"
-                    required
-                  />
-                </div>
-              </div>
-            )}
-            
-            <div>
-              <label className="block text-gray-700 dark:text-gray-300 mb-2">
-                {formData.userType === 'guardian' ? 'اسم الطالب' : 'اسمك الكامل'}
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                  <User className="h-5 w-5 text-gray-400" />
-                </div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Student's Full Name *
+                </label>
                 <input
                   type="text"
                   value={formData.studentName}
-                  onChange={(e) => setFormData(prev => ({ ...prev, studentName: e.target.value }))}
-                  className="input-field pr-10"
-                  placeholder={formData.userType === 'guardian' ? 'أدخل اسم الطالب' : 'أدخل اسمك الكامل'}
-                  required
+                  onChange={(e) => handleInputChange('studentName', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="Enter student's full name"
                 />
               </div>
+              {formData.userType === 'guardian' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Guardian's Full Name *
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.guardianName}
+                    onChange={(e) => handleInputChange('guardianName', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    placeholder="Enter guardian's full name"
+                  />
+                </div>
+              )}
             </div>
           </div>
         );
-      
+
       case 3:
         return (
-          <div>
-            <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-6">ما هو المستوى التعليمي؟</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {Object.entries(EDUCATION_LEVELS).map(([value, { name }]) => (
-                <button
-                  key={value}
-                  type="button"
-                  onClick={() => setFormData(prev => ({ 
-                    ...prev, 
-                    level: value as EducationalLevel,
-                    year: 1,
-                    stream: 'cst'
-                  }))}
-                  className={`p-6 rounded-xl border-2 transition-all ${
-                    formData.level === value
-                      ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
-                      : 'border-gray-200 dark:border-gray-600 hover:border-primary-200 dark:hover:border-primary-400'
-                  }`}
-                >
-                  <div className="flex flex-col items-center">
-                    <GraduationCap className="w-8 h-8 text-primary-600 dark:text-primary-400 mb-2" />
-                    <span className="text-lg font-medium text-gray-800 dark:text-gray-200">{name}</span>
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold text-gray-900 text-center">Choose Registration Method</h2>
+            <div className="space-y-4">
+              <button
+                type="button"
+                onClick={() => handleInputChange('registrationMethod', 'email')}
+                className={`w-full p-4 border-2 rounded-lg text-left transition-colors ${
+                  formData.registrationMethod === 'email'
+                    ? 'border-indigo-500 bg-indigo-50'
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+              >
+                <div className="flex items-center space-x-3">
+                  <Mail className="w-6 h-6 text-indigo-600" />
+                  <div>
+                    <h3 className="font-semibold">Email Address</h3>
+                    <p className="text-sm text-gray-600">Register using email and password</p>
                   </div>
-                </button>
-              ))}
+                </div>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleInputChange('registrationMethod', 'google')}
+                className={`w-full p-4 border-2 rounded-lg text-left transition-colors ${
+                  formData.registrationMethod === 'google'
+                    ? 'border-indigo-500 bg-indigo-50'
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                    G
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Google Account</h3>
+                    <p className="text-sm text-gray-600">Quick registration with Google</p>
+                  </div>
+                </div>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleInputChange('registrationMethod', 'phone')}
+                className={`w-full p-4 border-2 rounded-lg text-left transition-colors ${
+                  formData.registrationMethod === 'phone'
+                    ? 'border-indigo-500 bg-indigo-50'
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+              >
+                <div className="flex items-center space-x-3">
+                  <Phone className="w-6 h-6 text-indigo-600" />
+                  <div>
+                    <h3 className="font-semibold">Phone Number</h3>
+                    <p className="text-sm text-gray-600">Register using phone number</p>
+                  </div>
+                </div>
+              </button>
             </div>
           </div>
         );
-      
-      case 4:
-        if (formData.level === 'secondary') {
-          return (
-            <div>
-              <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-6">اختر السنة الدراسية والشعبة</h2>
-              
-              <div className="mb-8">
-                <h3 className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-4">السنة الدراسية</h3>
-                <div className="grid grid-cols-3 gap-4">
-                  {Array.from({ length: EDUCATION_LEVELS[formData.level].years }, (_, i) => (
-                    <button
-                      key={i + 1}
-                      type="button"
-                      onClick={() => setFormData(prev => ({ ...prev, year: (i + 1) as SecondaryYear }))}
-                      className={`p-4 rounded-xl border-2 transition-all ${
-                        formData.year === i + 1
-                          ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
-                          : 'border-gray-200 dark:border-gray-600 hover:border-primary-200 dark:hover:border-primary-400'
-                      }`}
-                    >
-                      <span className="text-lg font-medium text-gray-800 dark:text-gray-200">
-                        {EDUCATION_LEVELS.secondary.grades[i + 1 as SecondaryYear]}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-              
-              <div>
-                <h3 className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-4">
-                  {formData.year === 1 ? 'الجذع المشترك' : 'الشعبة المتخصصة'}
-                </h3>
-                <div className="grid grid-cols-1 gap-4">
-                  {formData.year === 1 ? (
-                    // First year - Common Core options
-                    <>
-                      <button
-                        type="button"
-                        onClick={() => setFormData(prev => ({ ...prev, stream: 'cst' }))}
-                        className={`p-4 rounded-xl border-2 transition-all text-right ${
-                          formData.stream === 'cst'
-                            ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
-                            : 'border-gray-200 dark:border-gray-600 hover:border-primary-200 dark:hover:border-primary-400'
-                        }`}
-                      >
-                        <span className="text-lg font-medium text-gray-800 dark:text-gray-200">
-                          {EDUCATION_LEVELS.secondary.streams.cst}
-                        </span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setFormData(prev => ({ ...prev, stream: 'cah' }))}
-                        className={`p-4 rounded-xl border-2 transition-all text-right ${
-                          formData.stream === 'cah'
-                            ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
-                            : 'border-gray-200 dark:border-gray-600 hover:border-primary-200 dark:hover:border-primary-400'
-                        }`}
-                      >
-                        <span className="text-lg font-medium text-gray-800 dark:text-gray-200">
-                          {EDUCATION_LEVELS.secondary.streams.cah}
-                        </span>
-                      </button>
-                    </>
-                  ) : (
-                    // Years 2 & 3 - Specialized streams
-                    Object.entries(EDUCATION_LEVELS.secondary.streams)
-                      .filter(([key]) => !['cst', 'cah'].includes(key))
-                      .map(([value, name]) => (
-                        <button
-                          key={value}
-                          type="button"
-                          onClick={() => setFormData(prev => ({ ...prev, stream: value as SecondaryStream }))}
-                          className={`p-4 rounded-xl border-2 transition-all text-right ${
-                            formData.stream === value
-                              ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
-                              : 'border-gray-200 dark:border-gray-600 hover:border-primary-200 dark:hover:border-primary-400'
-                          }`}
-                        >
-                          <span className="text-lg font-medium text-gray-800 dark:text-gray-200">{name}</span>
-                        </button>
-                      ))
-                  )}
-                </div>
-              </div>
-            </div>
-          );
-        } else {
-          return (
-            <div>
-              <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-6">اختر السنة الدراسية</h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {Array.from({ length: EDUCATION_LEVELS[formData.level].years }, (_, i) => (
-                  <button
-                    key={i + 1}
-                    type="button"
-                    onClick={() => setFormData(prev => ({ 
-                      ...prev, 
-                      year: (i + 1) as PrimaryGrade | MiddleGrade 
-                    }))}
-                    className={`p-4 rounded-xl border-2 transition-all ${
-                      formData.year === i + 1
-                        ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
-                        : 'border-gray-200 dark:border-gray-600 hover:border-primary-200 dark:hover:border-primary-400'
-                    }`}
-                  >
-                    <span className="text-lg font-medium text-gray-800 dark:text-gray-200">
-                      {formData.level === 'primary' 
-                        ? EDUCATION_LEVELS.primary.grades[i + 1 as PrimaryGrade]
-                        : EDUCATION_LEVELS.middle.grades[i + 1 as MiddleGrade]
-                      }
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          );
-        }
-      
-      case 5:
-        if (isTechnicalSpecializationStep()) {
-          return (
-            <div>
-              <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-6">اختر التخصص الهندسي</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {Object.entries(EDUCATION_LEVELS.secondary.technicalSpecializations).map(([value, name]) => (
-                  <button
-                    key={value}
-                    type="button"
-                    onClick={() => setFormData(prev => ({ ...prev, technicalSpecialization: value as TechnicalSpecialization }))}
-                    className={`p-6 rounded-xl border-2 transition-all text-right ${
-                      formData.technicalSpecialization === value
-                        ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
-                        : 'border-gray-200 dark:border-gray-600 hover:border-primary-200 dark:hover:border-primary-400'
-                    }`}
-                  >
-                    <div className="flex items-center">
-                      <Settings className="w-6 h-6 text-primary-600 dark:text-primary-400 ml-3" />
-                      <span className="text-lg font-medium text-gray-800 dark:text-gray-200">{name}</span>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          );
-        } else if (isForeignLanguageChoiceStep()) {
-          return (
-            <div>
-              <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-6">اختر اللغة الأجنبية الثالثة</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {Object.entries(EDUCATION_LEVELS.secondary.foreignLanguageChoices).map(([value, name]) => (
-                  <button
-                    key={value}
-                    type="button"
-                    onClick={() => setFormData(prev => ({ ...prev, foreignLanguageChoice: value as ForeignLanguageChoice }))}
-                    className={`p-6 rounded-xl border-2 transition-all text-center ${
-                      formData.foreignLanguageChoice === value
-                        ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
-                        : 'border-gray-200 dark:border-gray-600 hover:border-primary-200 dark:hover:border-primary-400'
-                    }`}
-                  >
-                    <span className="text-lg font-medium text-gray-800 dark:text-gray-200">{name}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          );
-        } else if (isEmailStep()) {
-          return (
-            <div>
-              <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-6">أدخل بريدك الإلكتروني</h2>
-              <div className="relative">
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  className="input-field pr-10"
-                  placeholder="أدخل بريدك الإلكتروني"
-                  required
-                />
-              </div>
-            </div>
-          );
-        }
-        break;
-      
-      case 6:
-      case 7:
-      case 8:
-        if (isForeignLanguageChoiceStep()) {
-          return (
-            <div>
-              <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-6">اختر اللغة الأجنبية الثالثة</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {Object.entries(EDUCATION_LEVELS.secondary.foreignLanguageChoices).map(([value, name]) => (
-                  <button
-                    key={value}
-                    type="button"
-                    onClick={() => setFormData(prev => ({ ...prev, foreignLanguageChoice: value as ForeignLanguageChoice }))}
-                    className={`p-6 rounded-xl border-2 transition-all text-center ${
-                      formData.foreignLanguageChoice === value
-                        ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
-                        : 'border-gray-200 dark:border-gray-600 hover:border-primary-200 dark:hover:border-primary-400'
-                    }`}
-                  >
-                    <span className="text-lg font-medium text-gray-800 dark:text-gray-200">{name}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          );
-        } else if (isEmailStep()) {
-          return (
-            <div>
-              <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-6">أدخل بريدك الإلكتروني</h2>
-              <div className="relative">
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  className="input-field pr-10"
-                  placeholder="أدخل بريدك الإلكتروني"
-                  required
-                />
-              </div>
-            </div>
-          );
-        } else if (isPasswordStep()) {
-          return (
-            <div className="space-y-6">
-              <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-6">أنشئ كلمة المرور</h2>
-              
-              <div>
-                <label className="block text-gray-700 dark:text-gray-300 mb-2">كلمة المرور</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    type="password"
-                    value={formData.password}
-                    onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                    className="input-field pr-10"
-                    placeholder="أدخل كلمة المرور"
-                    required
-                  />
-                </div>
-              </div>
-              
-              <div>
-                <label className="block text-gray-700 dark:text-gray-300 mb-2">تأكيد كلمة المرور</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    type="password"
-                    value={formData.confirmPassword}
-                    onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                    className="input-field pr-10"
-                    placeholder="أدخل كلمة المرور مرة أخرى"
-                    required
-                  />
-                </div>
-              </div>
-            </div>
-          );
-        }
-        break;
-      
+
       default:
-        return null;
+        return (
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Registration Complete!</h2>
+            <p className="text-gray-600 mb-6">Your account has been created successfully.</p>
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors"
+            >
+              Go to Dashboard
+            </button>
+          </div>
+        );
     }
   };
-  
-  const totalSteps = getTotalSteps();
-  
+
   return (
-    <div className="max-w-2xl mx-auto my-12 p-8 card">
-      <div className="mb-8">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200">إنشاء حساب جديد</h1>
-          <div className="text-sm text-gray-500 dark:text-gray-400">
-            الخطوة {currentStep} من {totalSteps}
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50 flex items-center justify-center p-4">
+      <div className="max-w-md w-full">
+        <div className="bg-white rounded-2xl shadow-xl p-8">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h1>
+            <p className="text-gray-600">Step {currentStep} of 3</p>
+          </div>
+
+          <div className="mb-8">
+            <div className="flex justify-between items-center">
+              {[1, 2, 3].map((step) => (
+                <div
+                  key={step}
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
+                    step <= currentStep
+                      ? 'bg-indigo-600 text-white'
+                      : 'bg-gray-200 text-gray-600'
+                  }`}
+                >
+                  {step < currentStep ? <Check className="w-4 h-4" /> : step}
+                </div>
+              ))}
+            </div>
+            <div className="mt-2 h-2 bg-gray-200 rounded-full">
+              <div
+                className="h-full bg-indigo-600 rounded-full transition-all duration-300"
+                style={{ width: `${(currentStep / 3) * 100}%` }}
+              />
+            </div>
+          </div>
+
+          <form onSubmit={handleSubmit}>
+            {renderStep()}
+
+            <div className="flex justify-between mt-8">
+              {currentStep > 1 && (
+                <button
+                  type="button"
+                  onClick={handleBack}
+                  className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  <span>Back</span>
+                </button>
+              )}
+              
+              <div className="ml-auto">
+                {currentStep < 3 ? (
+                  <button
+                    type="button"
+                    onClick={handleNext}
+                    className="flex items-center space-x-2 bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors"
+                  >
+                    <span>Next</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                ) : (
+                  <button
+                    type="submit"
+                    className="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors"
+                  >
+                    Create Account
+                  </button>
+                )}
+              </div>
+            </div>
+          </form>
+
+          <div className="mt-6 text-center">
+            <p className="text-gray-600">
+              Already have an account?{' '}
+              <Link to="/login" className="text-indigo-600 hover:text-indigo-700 font-semibold">
+                Sign in
+              </Link>
+            </p>
           </div>
         </div>
-        
-        <div className="relative">
-          <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-primary-100 dark:bg-primary-900/30">
-            <div
-              style={{ width: `${(currentStep / totalSteps) * 100}%` }}
-              className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-primary-500 transition-all duration-500"
-            />
-          </div>
-        </div>
-      </div>
-      
-      {error && (
-        <div className="bg-error-50 dark:bg-error-900/20 text-error-600 dark:text-error-400 p-3 rounded-lg mb-6">
-          {error}
-        </div>
-      )}
-      
-      <form onSubmit={currentStep === totalSteps ? handleSubmit : (e) => e.preventDefault()}>
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            key={currentStep}
-            custom={currentStep}
-            variants={slideVariants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            transition={{
-              x: { type: "spring", stiffness: 300, damping: 30 },
-              opacity: { duration: 0.2 }
-            }}
-          >
-            {renderStepContent(currentStep)}
-          </motion.div>
-        </AnimatePresence>
-        
-        <div className="mt-8 flex justify-between">
-          {currentStep > 1 && (
-            <button
-              type="button"
-              onClick={handleBack}
-              className="flex items-center text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300"
-            >
-              <ChevronRight className="h-5 w-5 ml-1" />
-              السابق
-            </button>
-          )}
-          
-          {currentStep < totalSteps ? (
-            <button
-              type="button"
-              onClick={handleNext}
-              className="btn-primary flex items-center mr-auto"
-            >
-              التالي
-              <ChevronLeft className="h-5 w-5 mr-1" />
-            </button>
-          ) : (
-            <button
-              type="submit"
-              className="btn-primary flex items-center mr-auto"
-              disabled={isLoading}
-            >
-              {isLoading ? 'جارِ إنشاء الحساب...' : 'إنشاء الحساب'}
-            </button>
-          )}
-        </div>
-      </form>
-      
-      <div className="mt-6 text-center text-gray-600 dark:text-gray-400">
-        لديك حساب بالفعل؟{' '}
-        <Link to="/login" className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
-          تسجيل الدخول
-        </Link>
-      </div>
-      
-      <div className="mt-8 p-4 bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 rounded-lg border border-green-200 dark:border-green-700">
-        <h3 className="font-semibold text-green-800 dark:text-green-200 mb-2 flex items-center">
-          <span className="w-2 h-2 bg-green-500 rounded-full ml-2"></span>
-          تمتع بفترة تجريبية مجانية لمدة 24 ساعة!
-        </h3>
-        <p className="text-sm text-gray-700 dark:text-gray-300">
-          عند إنشاء حساب جديد، ستحصل تلقائيًا على فترة تجريبية مجانية لمدة 24 ساعة للوصول إلى جميع محتويات المنصة.
-        </p>
       </div>
     </div>
   );
